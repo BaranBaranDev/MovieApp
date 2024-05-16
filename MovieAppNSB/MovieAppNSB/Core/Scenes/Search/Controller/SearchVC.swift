@@ -18,6 +18,14 @@ final class SearchVC: UIViewController {
     }()
     
     
+    private lazy var searchController : UISearchController = {
+        let sc = UISearchController(searchResultsController: SearchResultController())
+        sc.searchBar.placeholder = "Search for a Tv or a Movie"
+        sc.searchBar.searchBarStyle = .prominent
+        return sc
+    }()
+    
+    
     // MARK: - Properties
     
     private let viewModel : SearchViewModel
@@ -32,7 +40,7 @@ final class SearchVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
-        fetchData()
+        fetchData() 
     }
     
     required init?(coder: NSCoder) {
@@ -56,6 +64,9 @@ extension SearchVC {
         
         viewModel.delegate = self
         
+        // arama sonuçlarını güncellemek için delege belirttik. UISearchResultsUpdating Protokolü engtegre edeceğim
+        searchController.searchResultsUpdater = self
+        
         
     }
     
@@ -64,8 +75,13 @@ extension SearchVC {
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationItem.largeTitleDisplayMode = .always // navigationController?.navigationItem değil, doğrudan navigationItem kullanın.
         title = "Search"
+        
+        // SearchController
+        navigationItem.searchController = searchController
+        navigationItem.hidesSearchBarWhenScrolling = false
+        
     }
-
+    
     
     private func fetchData(){
         viewModel.fetchData()
@@ -93,7 +109,7 @@ extension SearchVC: UITableViewDelegate, UITableViewDataSource {
     
 }
 
-
+// MARK: - SearchViewModelDelegate Protocol
 extension SearchVC: SearchViewModelDelegate{
     func didFinish() {
         DispatchQueue.main.async { [weak self] in
@@ -106,3 +122,31 @@ extension SearchVC: SearchViewModelDelegate{
         print(error.localizedDescription)
     }
 }
+
+
+// MARK: - UISearchResultsUpdating Protocol
+
+extension SearchVC: UISearchResultsUpdating {
+    // Arama sonuçlarını güncellemek için UISearchResultsUpdating protokolünün gereksinimlerini karşılayan metod.
+    func updateSearchResults(for searchController: UISearchController) {
+        
+        let searchBar = searchController.searchBar  // Arama çubuğunu al
+        
+        // Arama sorgusunu al, başında ve sonunda boşluk karakterleri varsa kaldır ve boş olup olmadığını kontrol et
+        guard let query = searchBar.text?.trimmingCharacters(in: .whitespaces), !query.isEmpty, query.count >= 3,
+              // Arama sonuçlarını gösterecek olan SearchResultController'ı al
+              let resultsController = searchController.searchResultsController as? SearchResultController
+        else { return }
+        
+        fetchSearch(searchQuery: query, resultController: resultsController)
+    }
+    
+    // Belirli bir arama sorgusuyla arama sonuçlarını almak için özel bir fonksiyon
+    private func fetchSearch(searchQuery: String, resultController: SearchResultController) {
+        // MovieNetwork'ten arama sonuçlarını almak için bir ağ çağrısı yap
+        viewModel.search(searchQuery: searchQuery, resultController: resultController)
+        
+    }
+}
+
+

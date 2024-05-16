@@ -7,6 +7,10 @@
 
 import UIKit
 
+protocol HomeTableCellDelegate:AnyObject {
+    func didTapped(_ cell: HomeTableCell,model:PreviewModel)
+}
+
 final class HomeTableCell: UITableViewCell{
     // MARK: - UI Elements
     // her hücrede kayan bir yapı olmasını istiyorum o zaman collectionView kullanalım
@@ -22,6 +26,9 @@ final class HomeTableCell: UITableViewCell{
     static let reuseID: String = "HomeTableCell"
     
     private var movieArray : [Movie] = []
+    
+    weak var delegate: HomeTableCellDelegate?
+    
     
     // MARK: - İnitialization
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -57,7 +64,9 @@ final class HomeTableCell: UITableViewCell{
     }
 }
 
-extension HomeTableCell: UICollectionViewDataSource,UICollectionViewDelegate{
+
+// MARK: - UICollectionViewDataSource & UICollectionViewDelegate
+extension HomeTableCell: UICollectionViewDataSource{
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return movieArray.count
     }
@@ -76,5 +85,37 @@ extension HomeTableCell: UICollectionViewDataSource,UICollectionViewDelegate{
         return cell
     }
     
-    
 }
+
+extension HomeTableCell: UICollectionViewDelegate{
+    // hücrelere tıklama olursa haberleşmeyi sağlar
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        // kullanıcı bir öğe seçtikten sonra başka bir eylemi gerçekleştirmek istiyorsanız bu methodu kullanabilirsiniz.
+        collectionView.deselectItem(at: indexPath, animated: true)
+        
+        // film ismine ulaşacağız modelden
+        let movies = movieArray[indexPath.item]
+        guard let movieName = movies.originalName ?? movies.originalTitle else{return}
+        guard let movieOverview = movies.overview else{return}
+        
+        // evet tıklanan hücrenin ismiyle veriyi alacağız
+        YoutubeNetwork.shared.getMovie(with: "\(movieName) trailer ") { [weak self] result in
+            guard let self = self else{return}
+            switch result{
+            case .success(let video):
+                guard let searchVideoId = video.items[safe: indexPath.item]?.id.videoId else {
+                    // video.items dizisi belirtilen indekse sahip değilse veya video.items[indexPath.item].id.videoId nil ise
+                    return
+                }
+                // geçiş yapabilmek için delege kullandım çünkü celllerde Nav push kullanamam :) VC ye geçmeliyiz
+                self.delegate?.didTapped(self, model: PreviewModel(videoID: searchVideoId, title: movieName, overview: movieOverview))
+            case .failure(let error):
+                print(error.localizedDescription)
+            }
+        }
+        
+        
+    }
+}
+
+

@@ -47,8 +47,7 @@ final class DownloadsVC: UIViewController {
 extension DownloadsVC {
     private func setupUI(){
         drawDesign()
-    
-        setupNavBar()
+
         
     }
     private func drawDesign(){
@@ -61,16 +60,7 @@ extension DownloadsVC {
         
     }
     
-    // Navigasyon çubuğunu yapılandırır: büyük başlıkları tercih eder ve her zaman büyük başlık modunu kullanır.
-    private func setupNavBar(){
-        navigationController?.navigationBar.prefersLargeTitles = true
-        navigationItem.largeTitleDisplayMode = .always // navigationController?.navigationItem değil, doğrudan navigationItem kullanın.
-        title = "Search"
-        // Başlık metninin stilini ayarla
-          navigationController?.navigationBar.largeTitleTextAttributes = [
-              NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 36) // İstenilen büyüklükte font
-          ]
-    }
+ 
 
     
     

@@ -16,6 +16,7 @@ protocol MovieNetworkProtocol {
     func getPopularMovie(completion: @escaping (Result<MoviesResponse, NetworkError>) -> Void)
     func getTopRatedMovie(completion: @escaping(Result<MoviesResponse, NetworkError>) -> Void)
     func getDiscoverMovie(completion: @escaping(Result<MoviesResponse, NetworkError>) -> Void)
+    func getSearchMovie(searchQuery: String,completion: @escaping (Result<MoviesResponse, NetworkError>) -> Void)
 }
 
 // MARK: - MovieNetwork Class
@@ -28,6 +29,7 @@ final class MovieNetwork{
 
 
 extension MovieNetwork: MovieNetworkProtocol{
+
     func getTrendMovies(completion: @escaping (Result<MoviesResponse, NetworkError>) -> Void){
         NetworkManager.shared.fetchData(url: MovieURL.trendAll, completion: completion)
     }
@@ -48,6 +50,10 @@ extension MovieNetwork: MovieNetworkProtocol{
     }
     func getDiscoverMovie(completion: @escaping (Result<MoviesResponse, NetworkError>) -> Void){
         NetworkManager.shared.fetchData(url: MovieURL.discoverMovie, completion: completion)
+    }
+    
+    func getSearchMovie(searchQuery: String,completion: @escaping (Result<MoviesResponse, NetworkError>) -> Void) {
+        NetworkManager.shared.fetchData(url: MovieURL.searchMovie(query: searchQuery)!, completion: completion)
     }
     
 }

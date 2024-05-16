@@ -22,4 +22,13 @@ struct MovieURL {
     static let topratedMovie = "\(ConstantsMovie.baseURL)/3/movie/top_rated?api_key=\(ConstantsMovie.API_KEY)&language=en-US&page=1"
     static let discoverMovie = "\(ConstantsMovie.baseURL)/3/discover/movie?api_key=\(ConstantsMovie.API_KEY)&language=en-US&sort_by=popularity.desc&include_adult=false&include_video=false&page=1&with_watch_monetization_types=flatrate"
     
+    static func searchMovie(query: String) -> String? {
+        // query dizesindeki karakterleri URL sorgusu için uygun bir şekilde kodlar veya kaçar (escape) eder
+        guard let escapedQuery = query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else { return nil }
+
+        return "\(ConstantsMovie.baseURL)/3/search/movie?query=\(escapedQuery)&api_key=\(ConstantsMovie.API_KEY)"
+    }
 }
+           
+
+

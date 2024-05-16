@@ -52,6 +52,8 @@ final class HomeVC: UIViewController {
         setupUI()
         viewModel.fetchData()
         viewModel.output = self
+        
+
     }
     
     required init?(coder: NSCoder) {
@@ -76,6 +78,8 @@ extension HomeVC {
         
         // tableview için header alanı oluşturduk
         tableView.tableHeaderView = HeroHeaderView(frame: .init(x: 0, y: 0, width: view.bounds.width, height: 350))
+        
+            
     }
     
     private func configureNavBar(){
@@ -107,6 +111,7 @@ extension HomeVC: UITableViewDelegate, UITableViewDataSource {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: HomeTableCell.reuseID, for: indexPath) as? HomeTableCell else{
             return UITableViewCell()
         }
+        cell.delegate = self
         
         // Her bölüm için veri almak ve hücreyi yapılandırmak
         switch indexPath.section{ //indexPath.section: Bu, TableView'deki belirli bir bölümün indisini temsil eder.
@@ -198,4 +203,16 @@ extension HomeVC: HomeViewModelDelegate{
       
     }
     
+}
+
+
+// MARK: - HomeTableCellDelegate Protocol
+extension HomeVC: HomeTableCellDelegate{
+    func didTapped(_ cell: HomeTableCell, model: PreviewModel) {
+        DispatchQueue.main.async {
+            let vc = PreviewVC()
+            vc.configureUI(with: model)
+            self.navigationController?.pushViewController(vc, animated: true)
+        }
+    }
 }
