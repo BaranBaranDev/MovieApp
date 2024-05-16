@@ -8,6 +8,10 @@
 import UIKit
 import SnapKit
 
+protocol DownloadCellDelegate:AnyObject {
+    func didTapped(_ cell: DownloadCell, model:PreviewModel)
+}
+
 final class DownloadCell: UITableViewCell{
     
     // MARK: - UI Elements
@@ -32,6 +36,7 @@ final class DownloadCell: UITableViewCell{
         let image = UIImage(systemName: "play.circle", withConfiguration: UIImage.SymbolConfiguration(pointSize: 30))
         btn.setImage(image, for: .normal)
         btn.tintColor = .white
+        btn.addTarget(self, action: #selector(tappedPlay), for: .touchUpInside)
         return btn
     }()
     
@@ -55,6 +60,10 @@ final class DownloadCell: UITableViewCell{
         }
     }
     
+    public var indexPath: IndexPath?
+    
+    weak var delegate : DownloadCellDelegate?
+    
     // MARK: - İnitialization
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -66,7 +75,6 @@ final class DownloadCell: UITableViewCell{
         fatalError("init(coder:) has not been implemented")
     }
     
-    
     // MARK: - ReloadUI
     
     private func reloadUI(){
@@ -76,6 +84,28 @@ final class DownloadCell: UITableViewCell{
         posterImage.sd_setImage(with: url, completed: nil)
         
         posterTitle.text = downloadMovie.originalName ?? downloadMovie.originalTitle
+    }
+    
+    // MARK: - Actions
+    @objc fileprivate func tappedPlay(){
+        guard let downloadMovie = downloadMovie else{return}
+
+        let movieName =  downloadMovie.originalName ?? downloadMovie.originalTitle ?? ""
+        
+        YoutubeNetwork.shared.getMovie(with: "\(movieName) trailer ") { [weak self] result in
+            guard let self = self else{return}
+            switch result{
+            case .success(let video):
+                guard let searchVideoId = video.items[safe: indexPath!.item]?.id.videoId else {
+                    // video.items dizisi belirtilen indekse sahip değilse veya video.items[indexPath.item].id.videoId nil ise
+                    return
+                }
+                // geçiş yapabilmek için delege kullandım çünkü celllerde Nav push kullanamam :) VC ye geçmeliyiz
+                self.delegate?.didTapped(self, model: PreviewModel(videoID: searchVideoId, title: movieName, overview: ""))
+            case .failure(let error):
+                print(error.localizedDescription)
+            }
+        }
     }
     
 }

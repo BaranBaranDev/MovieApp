@@ -25,8 +25,13 @@ final class DownloadsVC: UIViewController {
     init(viewModel: DownloadViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
+        // viewmodel delege belirleme
         viewModel.delegate = self
         
+        // Bildirimi dinleme
+        NotificationCenter.default.addObserver(forName: Notification.Name("Download"), object: nil, queue: nil) {[weak self] notification in
+            self?.fetchDownloadData()
+        }
         
     }
     
@@ -85,8 +90,10 @@ extension DownloadsVC: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: DownloadCell.reuseID, for: indexPath) as? DownloadCell else{return UITableViewCell()}
-        
+        cell.delegate = self
         cell.downloadMovie = viewModel.databaseArray[indexPath.item]
+        cell.indexPath = indexPath
+        
         return cell
     }
     
@@ -100,16 +107,21 @@ extension DownloadsVC: UITableViewDelegate, UITableViewDataSource {
             viewModel.deleteData(indexPath: indexPath)
         }
     }
+    
+    
+    
+    
 
 }
 
 // MARK: - DownloadViewModelDelegate Protocol
 
 extension DownloadsVC: DownloadViewModelDelegate {
+
     func didFinish() {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
-            self.updateTableView()
+            self.tableView.reloadData()
         }
     }
 
@@ -117,7 +129,19 @@ extension DownloadsVC: DownloadViewModelDelegate {
         print(error.localizedDescription)
     }
     
-    private func updateTableView() {
-        tableView.reloadData()
+}
+
+
+// MARK: - DownloadCellDelegate Protocol
+
+extension DownloadsVC:DownloadCellDelegate{
+    func didTapped(_ cell: DownloadCell, model: PreviewModel) {
+        DispatchQueue.main.async {
+            let vc = PreviewVC()
+            vc.configureUI(with: model)
+            self.navigationController?.pushViewController(vc, animated: true)
+        }
     }
+    
+    
 }

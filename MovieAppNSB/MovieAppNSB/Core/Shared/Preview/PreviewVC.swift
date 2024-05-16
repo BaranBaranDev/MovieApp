@@ -17,7 +17,6 @@ final class PreviewVC: UIViewController {
         
         let label = UILabel()
         label.font = .systemFont(ofSize: 22, weight: .bold)
-        label.text = "fasfadsfdsfgaesgfaes"
         return label
     }()
     
@@ -25,7 +24,6 @@ final class PreviewVC: UIViewController {
         let label = UILabel()
         label.font = .systemFont(ofSize: 18, weight: .regular)
         label.numberOfLines = 0
-        label.text = "fasfadsfdsfgaesgfaes"
         return label
     }()
     

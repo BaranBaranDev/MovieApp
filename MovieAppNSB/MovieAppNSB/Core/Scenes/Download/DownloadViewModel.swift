@@ -46,7 +46,7 @@ extension DownloadViewModel{
             switch result{
             case .success():
                 self.databaseArray.remove(at: indexPath.item)
-                self.delegate?.didFinish()
+                delegate?.didFinish()
             case .failure(let error):
                 delegate?.didFail(error)
             }

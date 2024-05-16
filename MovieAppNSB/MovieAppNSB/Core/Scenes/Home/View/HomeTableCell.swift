@@ -142,8 +142,8 @@ extension HomeTableCell: UICollectionViewDelegate{
             guard self != nil else { return }
             switch result{
             case .success():
-                print("downloads")
-            case .failure(let error):
+                // Bildirim yayımlama
+                NotificationCenter.default.post(name: Notification.Name("Download"), object: nil)            case .failure(let error):
                 print(error.localizedDescription)
             }
         }
