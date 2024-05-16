@@ -77,7 +77,7 @@ extension HomeVC {
         view.addSubview(tableView)
         
         // tableview için header alanı oluşturduk
-        tableView.tableHeaderView = HeroHeaderView(frame: .init(x: 0, y: 0, width: view.bounds.width, height: 350))
+        tableView.tableHeaderView = HeroHeaderView(frame: .init(x: 0, y: 0, width: view.bounds.width, height: 450))
         
             
     }

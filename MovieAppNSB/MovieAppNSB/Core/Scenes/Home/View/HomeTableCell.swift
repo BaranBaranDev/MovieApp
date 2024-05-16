@@ -113,9 +113,43 @@ extension HomeTableCell: UICollectionViewDelegate{
                 print(error.localizedDescription)
             }
         }
-        
-        
     }
+    
+    // MARK: - ContextMenuConfigurationForItemAt
+    // Uzun basınca etkileşim kazandırmak için yani download işlemi
+    
+    func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
+        // Açılır menü için gereken eylemleri sağlayan işlev
+        let actionProvider: ([UIMenuElement]) -> UIMenu? = { [weak self] suggestedActions in
+            // İndirme eylemi tanımlanıyor
+            let downloadAction = UIAction(title: "Download", image: UIImage(systemName: "arrow.down")) { _ in
+                guard let self = self else { return }
+                // İndirme işlemi gerçekleştiriliyor
+                self.performDownloadAction(indexPath: indexPath)
+            }
+            // Menü oluşturuluyor ve içeriği ekleniyor
+            return UIMenu(title: "", children: [downloadAction])
+        }
+        
+        // Açılır menü yapılandırması oluşturuluyor ve döndürülüyor
+        return UIContextMenuConfiguration(identifier: nil, previewProvider: nil, actionProvider: actionProvider)
+    }
+    
+    // İndirme işlemini gerçekleştiren işlev
+    func performDownloadAction(indexPath: IndexPath) {
+        // İndirme işlemi burada gerçekleştirilebilir
+        DataManager.shared.saveDatabase(model: movieArray[indexPath.item]) {[weak self] result in
+            guard self != nil else { return }
+            switch result{
+            case .success():
+                print("downloads")
+            case .failure(let error):
+                print(error.localizedDescription)
+            }
+        }
+    }
+  
+    
 }
 
 

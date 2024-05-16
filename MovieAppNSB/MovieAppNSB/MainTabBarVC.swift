@@ -13,9 +13,9 @@ final class MainTabBarVC: UITabBarController {
     
  // MARK: - Properties
     private let vc1 = UINavigationController(rootViewController: HomeBuilder.make())
-    private let vc2 = UINavigationController(rootViewController: UpcomingVC(viewModel: UpcomingViewModel()))
-    private let vc3 = UINavigationController(rootViewController: SearchVC(viewModel: SearchViewModel()))
-    private let vc4 = UINavigationController(rootViewController: DownloadsVC())
+    private let vc2 = UINavigationController(rootViewController: UpcomingBuilder.make())
+    private let vc3 = UINavigationController(rootViewController: SearchBuilder.make())
+    private let vc4 = UINavigationController(rootViewController: DownloadBuilder.make())
     
 // MARK: - LifeCycle
     override func viewDidLoad() {
